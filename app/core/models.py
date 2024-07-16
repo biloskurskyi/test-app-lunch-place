@@ -30,9 +30,13 @@ class UserManager(BaseUserManager):
 
 
 class User(AbstractUser):
+    EMPLOYEE_USER = 0
+    RESTAURANT_USER = 1
+    POST_TYPE = ((EMPLOYEE_USER, 'EMPLOYEE USER'), (RESTAURANT_USER, 'RESTAURANT USER'),)
     name = models.CharField(max_length=255)
     email = models.CharField(max_length=255, unique=True)
     password = models.CharField(max_length=255)
+    user_type = models.SmallIntegerField(choices=POST_TYPE)
     username = None
 
     USERNAME_FIELD = 'email'
@@ -46,3 +50,32 @@ class User(AbstractUser):
 
     def __str__(self):
         return f"{self.name} with email {self.email}"
+
+
+class Lunch(models.Model):
+    MONDAY = 0
+    TUESDAY = 1
+    WEDNESDAY = 2
+    THURSDAY = 3
+    FRIDAY = 4
+    SATURDAY = 5
+    SUNDAY = 6
+
+    WEEK_DAYS = (
+        (MONDAY, 'Monday'),
+        (TUESDAY, 'Tuesday'),
+        (WEDNESDAY, 'Wednesday'),
+        (THURSDAY, 'Thursday'),
+        (FRIDAY, 'Friday'),
+        (SATURDAY, 'Saturday'),
+        (SUNDAY, 'Sunday'),
+    )
+
+    menu = models.CharField(max_length=255)
+    user = models.ForeignKey(User, on_delete=models.PROTECT)
+    day = models.SmallIntegerField(choices=WEEK_DAYS)
+
+    class Meta:
+        verbose_name = "Lunch"
+        verbose_name_plural = "Lunch menu"
+        unique_together = ('user', 'day')
