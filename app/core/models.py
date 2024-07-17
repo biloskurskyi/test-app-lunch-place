@@ -1,5 +1,6 @@
 from django.contrib.auth.models import AbstractUser, BaseUserManager
 from django.db import models
+from django.utils import timezone
 
 
 class UserManager(BaseUserManager):
@@ -79,3 +80,32 @@ class Lunch(models.Model):
         verbose_name = "Lunch"
         verbose_name_plural = "Lunch menu"
         unique_together = ('user', 'day')
+
+
+class LunchVoting(models.Model):
+    user = models.ForeignKey(User, on_delete=models.PROTECT)
+    lunch = models.ForeignKey(Lunch, on_delete=models.PROTECT)
+    # day = models.SmallIntegerField(choices=Lunch.WEEK_DAYS)
+    date = models.DateField(default=timezone.now)
+
+    class Meta:
+        verbose_name = "Lunch Voting"
+        verbose_name_plural = "Lunch Voting"
+        unique_together = ('user', 'date')
+
+    def __str__(self):
+        return f"{self.user} voted for {self.lunch} on {self.date}"
+
+
+class LunchReport(models.Model):
+    lunch = models.ForeignKey(Lunch, on_delete=models.PROTECT)
+    date = models.DateField()
+    count = models.SmallIntegerField(default=0)
+
+    class Meta:
+        verbose_name = "Lunch Report"
+        verbose_name_plural = "Lunch Reports"
+        unique_together = ('lunch', 'date')
+
+    def __str__(self):
+        return f"{self.lunch} on {self.date} has {self.count} votes"

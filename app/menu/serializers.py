@@ -1,7 +1,6 @@
+from core.models import Lunch, User
 from django.shortcuts import get_object_or_404
 from rest_framework import serializers
-
-from core.models import Lunch, User
 
 
 class LunchSerializer(serializers.ModelSerializer):

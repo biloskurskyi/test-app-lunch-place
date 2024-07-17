@@ -1,7 +1,6 @@
 import jwt
-from rest_framework import authentication, exceptions
-
 from core.models import User
+from rest_framework import authentication, exceptions
 
 
 class JWTAuthentication(authentication.BaseAuthentication):
