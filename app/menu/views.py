@@ -49,7 +49,7 @@ class MenuView(APIView):
         menu = Lunch.objects.filter(user=user.id)
         serializer = LunchSerializer(menu, many=True)
         if not menu.exists():
-            return Response({"error": "Menu does not exist"}, status=200)
+            return Response({"message": "Menu does not exist"}, status=200)
 
         if request.user.user_type == 1:
             return Response(serializer.data, status=200)

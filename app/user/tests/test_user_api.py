@@ -6,8 +6,8 @@ from rest_framework.test import APIClient
 from core.models import User
 
 
-class PublicUserApiTests(TestCase):
-    """Test the public features of the user API."""
+class UserApiTestsBase(TestCase):
+    """Base class with common setup and helper methods."""
 
     def setUp(self):
         self.client = APIClient()
@@ -23,13 +23,13 @@ class PublicUserApiTests(TestCase):
         }
 
     def register_user(self, **kwargs):
-        """Helper method to register a user"""
+        """Helper method to register a user."""
         data = self.user_data.copy()
         data.update(kwargs)
         return self.client.post(self.register_url, data, format='json')
 
     def login_user(self, **kwargs):
-        """Helper method to log in a user"""
+        """Helper method to log in a user."""
         data = {
             'email': self.user_data['email'],
             'password': self.user_data['password'],
@@ -38,11 +38,13 @@ class PublicUserApiTests(TestCase):
         return self.client.post(self.login_url, data, format='json')
 
     def get_token(self):
-        """Helper method to get token"""
+        """Helper method to get token."""
         response = self.login_user()
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         return response.data['jwt']
 
+
+class UserApiTests(UserApiTestsBase):
     def test_register_user_success(self):
         """
         Ensure we can create a new user.
