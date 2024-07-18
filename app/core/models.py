@@ -85,7 +85,6 @@ class Lunch(models.Model):
 class LunchVoting(models.Model):
     user = models.ForeignKey(User, on_delete=models.PROTECT)
     lunch = models.ForeignKey(Lunch, on_delete=models.PROTECT)
-    # day = models.SmallIntegerField(choices=Lunch.WEEK_DAYS)
     date = models.DateField(default=timezone.now)
 
     class Meta:

@@ -1,11 +1,12 @@
-from common.common_views import LunchVotingBaseView
-from core.models import Lunch, LunchReport, LunchVoting, User
 from django.utils import timezone
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from .serializers import LunchSerializer
+from common.common_views import LunchVotingBaseView
+from core.models import Lunch, LunchReport, LunchVoting, User
+
+from .serializers import LunchReportSerializer, LunchSerializer
 from .time.day import get_current_day_kiev, hour_in_kiev
 
 
@@ -24,6 +25,15 @@ class MenuView(APIView):
         return Response({"message": "This user has not this permission"}, status=400)
 
     def get(self, request):
+        user = request.user
+        if user.user_type == 0:
+            return self.get_user_menu(request)
+        elif user.user_type == 1:
+            return self.get_for_restaurant(request)
+        else:
+            return Response({"error": "Invalid user type"}, status=400)
+
+    def get_user_menu(self, request):
         menu = Lunch.objects.filter(day=get_current_day_kiev())
         serializer = LunchSerializer(menu, many=True)
         if not menu.exists():
@@ -32,7 +42,19 @@ class MenuView(APIView):
         if request.user.user_type == 0:
             return Response(serializer.data, status=200)
 
-        return Response({"message": "This user has not this permission"}, status=403)
+        return Response({"message": "This user does not have this permission"}, status=403)
+
+    def get_for_restaurant(self, request):
+        user = request.user
+        menu = Lunch.objects.filter(user=user.id)
+        serializer = LunchSerializer(menu, many=True)
+        if not menu.exists():
+            return Response({"error": "Menu does not exist"}, status=200)
+
+        if request.user.user_type == 1:
+            return Response(serializer.data, status=200)
+
+        return Response({"message": "This user does not have this permission"}, status=403)
 
 
 class MenuItemView(APIView):
@@ -98,6 +120,7 @@ class MenuItemView(APIView):
 
 
 class LunchVotingView(LunchVotingBaseView):
+
     def post(self, request, pk):
         user, date = self.get_user_and_date(request)
         lunch = self.get_lunch(pk)
@@ -184,3 +207,18 @@ class RemoveVotingView(LunchVotingBaseView):
             return Response({'message': 'Delete successful!'}, status=204)
         except Exception as e:
             return Response({"error": str(e)}, status=400)
+
+
+class VotingResultsView(APIView):
+    def get(self, request):
+        user = request.user
+        if user.user_type != 1:
+            return Response({"error": "You do not have permission to access this resource"}, status=403)
+
+        menu = Lunch.objects.filter(user=user.id, day=get_current_day_kiev())
+        if not menu.exists():
+            return Response({"message": "No menu for today"}, status=404)
+
+        reports = LunchReport.objects.filter(lunch__in=menu, date=timezone.now().date())
+        serializer = LunchReportSerializer(reports, many=True)
+        return Response(serializer.data, status=200)

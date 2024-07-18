@@ -1,5 +1,6 @@
-from core.models import User
 from rest_framework import serializers
+
+from core.models import User
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -13,6 +14,5 @@ class UserSerializer(serializers.ModelSerializer):
         instance = self.Meta.model(**validated_data)
         if password is not None:
             instance.set_password(password)
-        # instance.is_active = False
         instance.save()
         return instance

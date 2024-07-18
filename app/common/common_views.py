@@ -1,9 +1,10 @@
-from core.models import Lunch
 from django.utils import timezone
-from menu.time.day import get_current_day_kiev, hour_in_kiev
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
+
+from core.models import Lunch
+from menu.time.day import get_current_day_kiev, hour_in_kiev
 
 
 class LunchVotingBaseView(APIView):
