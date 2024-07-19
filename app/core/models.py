@@ -19,6 +19,7 @@ class UserManager(BaseUserManager):
         extra_fields.setdefault('is_staff', True)
         extra_fields.setdefault('is_superuser', True)
         extra_fields.setdefault('is_active', True)
+        extra_fields['user_type'] = 0
 
         if extra_fields.get('is_staff') is not True:
             raise ValueError('Superuser must have is_staff=True.')
@@ -50,7 +51,10 @@ class User(AbstractUser):
         verbose_name_plural = "Users"
 
     def __str__(self):
-        return f"{self.name} with email {self.email}"
+        if self.user_type == 0:
+            return f"{self.name} with email {self.email}"
+        elif self.user_type == 1:
+            return f"{self.name}"
 
 
 class Lunch(models.Model):
@@ -80,6 +84,9 @@ class Lunch(models.Model):
         verbose_name = "Lunch"
         verbose_name_plural = "Lunch menu"
         unique_together = ('user', 'day')
+
+    def __str__(self):
+        return f"restaurant {self.user} with {self.menu} on week day {self.get_day_display()}"
 
 
 class LunchVoting(models.Model):

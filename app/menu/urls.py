@@ -8,7 +8,7 @@ app_name = 'menu'
 urlpatterns = [
     path('menu/', MenuView.as_view(), name='menu'),
     path('menu/<int:pk>/', MenuItemView.as_view(), name='menuItem'),
-    path('vote/<int:pk>/', LunchVotingView.as_view(), name='vote'),
+    path('vote/<int:pk>/', LunchVotingView.as_view(), name='voteItem'),
     path('remove-vote/', RemoveVotingView.as_view(), name='vote'),
     path('result/', VotingResultsView.as_view(), name='result')
 ]

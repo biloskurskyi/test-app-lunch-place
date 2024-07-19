@@ -20,7 +20,7 @@ class LunchVotingBaseView(APIView):
 
     def check_user_permission(self, user):
         if user.user_type != 0:
-            return {"error": "You gave not permission for voting."}, 403
+            return {"error": "You have not permission for voting."}, 403
         return None
 
     def check_time_limit(self):
